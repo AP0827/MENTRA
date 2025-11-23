@@ -1,32 +1,24 @@
-// Using node-fetch or built-in fetch
-const fetch = global.fetch || require('node-fetch');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Assuming env var
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-if (!OPENAI_API_KEY) {
-  console.warn("OPENAI_API_KEY is not set.");
+if (!GEMINI_API_KEY) {
+  console.warn("GEMINI_API_KEY is not set.");
 }
 
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
 const generateEmbedding = async function(text) {
-  const res = await fetch("https://api.openai.com/v1/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      input: text,
-      model: "text-embedding-ada-002"
-    })
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Embedding error ${res.status}: ${text}`);
+  try {
+    const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    
+    const result = await model.embedContent(text);
+    const embedding = result.embedding;
+    
+    return embedding.values;
+  } catch(error) {
+    throw new Error(`Embedding error: ${error.message}`);
   }
-
-  const j = await res.json();
-  return j.data[0].embedding;
 };
 
 module.exports = {

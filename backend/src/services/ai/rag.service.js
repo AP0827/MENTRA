@@ -15,7 +15,7 @@ async function runRAG(text, question="", memories=[], opts={}){
         .replace("{text}", text)
         .replace("{memories}", memoriesJoined);
 
-    const response = await llm.generate(prompt, "gpt-4o-mini", 0.7, 150, system);
+    const response = await llm.generate(prompt, "gemini-2.0-flash-001", 0.7, 150, system);
     return {
         suggestion : response.text,
         metadata:{

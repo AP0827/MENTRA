@@ -216,7 +216,7 @@ function showReflectionModal(website, url, prompt, count) {
         </label>
         <div id="mentra-quick-responses" style="margin-bottom: 18px; text-align: center;">
           ${QUICK_RESPONSES.map((resp, i) => `
-            <button class="mentra-quick-btn" data-response="${resp.text}" onclick="selectQuickResponse(${i}, '${resp.text}')">
+            <button class="mentra-quick-btn" data-index="${i}" data-response="${resp.text}">
               <span>${resp.emoji}</span> ${resp.text}
             </button>
           `).join('')}
@@ -234,8 +234,6 @@ function showReflectionModal(website, url, prompt, count) {
                    border-radius: 16px; font-size: 14px; resize: vertical; min-height: 85px;
                    font-family: inherit; color: #334155 !important; background: white !important;
                    transition: all 0.3s; margin-top: 12px; box-sizing: border-box;"
-            onfocus="this.style.borderColor='#0ea5e9'; this.style.boxShadow='0 0 0 3px rgba(14, 165, 233, 0.1)'"
-            onblur="this.style.borderColor='#e0f2fe'; this.style.boxShadow='none'"
           ></textarea>
         </details>
       </div>
@@ -253,25 +251,23 @@ function showReflectionModal(website, url, prompt, count) {
           ⏱️ Need more time here?
         </label>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px;">
-          <button class="mentra-whitelist-btn" style="justify-content: center; width: 100%;" onclick="whitelistFor(10, '${website}')">
+          <button class="mentra-whitelist-btn mentra-whitelist-10min" data-website="${website}" style="justify-content: center; width: 100%;">
             <span>⏰</span> Allow for 10 minutes
           </button>
-          <button class="mentra-whitelist-btn" style="justify-content: center; width: 100%;" onclick="whitelistForSession('${website}')">
+          <button class="mentra-whitelist-btn mentra-whitelist-session" data-website="${website}" style="justify-content: center; width: 100%;">
             <span>🔓</span> Allow for this session
           </button>
-          <button class="mentra-whitelist-btn" style="justify-content: center; width: 100%;" onclick="whitelistUntil('tomorrow', '${website}')">
+          <button class="mentra-whitelist-btn mentra-whitelist-tomorrow" data-website="${website}" style="justify-content: center; width: 100%;">
             <span>🌙</span> Allow until tomorrow
           </button>
         </div>
       </div>
 
       <div style="display: flex !important; gap: 12px !important; margin-top: 24px !important;">
-        <button class="mentra-btn mentra-btn-secondary" style="flex: 1 !important;" 
-                onclick="closeModal()">
+        <button class="mentra-btn mentra-btn-secondary mentra-close-btn" style="flex: 1 !important;">
           ← Go back
         </button>
-        <button id="mentra-submit-btn" class="mentra-btn mentra-btn-primary" style="flex: 1.5 !important;" 
-                onclick="submitReflection('${website}', '${url}', '${prompt}')">
+        <button id="mentra-submit-btn" class="mentra-btn mentra-btn-primary" data-website="${website}" data-url="${url}" data-prompt="${prompt}" style="flex: 1.5 !important;">
           Continue mindfully →
         </button>
       </div>
@@ -307,22 +303,21 @@ function showReflectionModal(website, url, prompt, count) {
       <div style="margin-bottom: 22px;">
         <p style="color: #64748b; font-size: 14px; margin-bottom: 12px; font-weight: 500;">Was this helpful?</p>
         <div style="display: flex; gap: 10px;">
-          <button class="mentra-btn mentra-btn-secondary" style="flex: 1;" onclick="feedbackNo()">
+          <button class="mentra-btn mentra-btn-secondary mentra-feedback-no" style="flex: 1;">
             Not really
           </button>
-          <button class="mentra-btn mentra-btn-primary" style="flex: 1;" onclick="feedbackYes()">
+          <button class="mentra-btn mentra-btn-primary mentra-feedback-yes" style="flex: 1;">
             Yes, helpful! 💚
           </button>
         </div>
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <button class="mentra-btn mentra-btn-secondary" style="flex: 1;" onclick="closeModal()">
+        <button class="mentra-btn mentra-btn-secondary mentra-close-btn" style="flex: 1;">
           ← Go back
         </button>
-        <button class="mentra-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                                           color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);" 
-                onclick="proceedToSite()">
+        <button class="mentra-btn mentra-proceed-btn" style="flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                                           color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);">
           Proceed mindfully →
         </button>
       </div>
@@ -352,8 +347,9 @@ function showReflectionModal(website, url, prompt, count) {
 // Set up event listeners for modal buttons
 function setupEventListeners(website, url, prompt) {
   // Quick response buttons
-  document.querySelectorAll('.mentra-quick-btn').forEach((btn, index) => {
+  document.querySelectorAll('.mentra-quick-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
+      const index = parseInt(btn.dataset.index);
       const response = QUICK_RESPONSES[index].emoji + ' ' + QUICK_RESPONSES[index].text;
       // If already selected, deselect it
       if (btn.classList.contains('selected')) {
@@ -365,33 +361,75 @@ function setupEventListeners(website, url, prompt) {
     });
   });
   
+  // Textarea focus/blur for styling
+  const textarea = document.getElementById('mentra-reflection-input');
+  if (textarea) {
+    textarea.addEventListener('focus', function() {
+      this.style.borderColor = '#0ea5e9';
+      this.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
+    });
+    textarea.addEventListener('blur', function() {
+      this.style.borderColor = '#e0f2fe';
+      this.style.boxShadow = 'none';
+    });
+  }
+  
   // Submit button
   const submitBtn = document.getElementById('mentra-submit-btn');
   if (submitBtn) {
-    submitBtn.addEventListener('click', () => window.submitReflection(website, url, prompt));
+    submitBtn.addEventListener('click', () => {
+      const btnWebsite = submitBtn.dataset.website;
+      const btnUrl = submitBtn.dataset.url;
+      const btnPrompt = submitBtn.dataset.prompt;
+      window.submitReflection(btnWebsite, btnUrl, btnPrompt);
+    });
   }
   
   // Whitelist buttons
-  const whitelistBtns = document.querySelectorAll('.mentra-whitelist-btn');
-  if (whitelistBtns[0]) whitelistBtns[0].addEventListener('click', () => window.whitelistFor(10, website));
-  if (whitelistBtns[1]) whitelistBtns[1].addEventListener('click', () => window.whitelistForSession(website));
-  if (whitelistBtns[2]) whitelistBtns[2].addEventListener('click', () => window.whitelistUntil('tomorrow', website));
+  const whitelist10min = document.querySelector('.mentra-whitelist-10min');
+  const whitelistSession = document.querySelector('.mentra-whitelist-session');
+  const whitelistTomorrow = document.querySelector('.mentra-whitelist-tomorrow');
+  
+  if (whitelist10min) {
+    whitelist10min.addEventListener('click', () => {
+      const btnWebsite = whitelist10min.dataset.website;
+      window.whitelistFor(10, btnWebsite);
+    });
+  }
+  if (whitelistSession) {
+    whitelistSession.addEventListener('click', () => {
+      const btnWebsite = whitelistSession.dataset.website;
+      window.whitelistForSession(btnWebsite);
+    });
+  }
+  if (whitelistTomorrow) {
+    whitelistTomorrow.addEventListener('click', () => {
+      const btnWebsite = whitelistTomorrow.dataset.website;
+      window.whitelistUntil('tomorrow', btnWebsite);
+    });
+  }
   
   // Close/back buttons
-  document.querySelectorAll('button').forEach(btn => {
-    if (btn.textContent.includes('Go back')) {
-      btn.addEventListener('click', window.closeModal);
-    }
-    if (btn.textContent.includes('Proceed mindfully')) {
-      btn.addEventListener('click', window.proceedToSite);
-    }
-    if (btn.textContent.includes('Not really')) {
-      btn.addEventListener('click', window.feedbackNo);
-    }
-    if (btn.textContent.includes('Yes, helpful')) {
-      btn.addEventListener('click', window.feedbackYes);
-    }
+  document.querySelectorAll('.mentra-close-btn').forEach(btn => {
+    btn.addEventListener('click', window.closeModal);
   });
+  
+  // Proceed button
+  const proceedBtn = document.querySelector('.mentra-proceed-btn');
+  if (proceedBtn) {
+    proceedBtn.addEventListener('click', window.proceedToSite);
+  }
+  
+  // Feedback buttons
+  const feedbackNoBtn = document.querySelector('.mentra-feedback-no');
+  const feedbackYesBtn = document.querySelector('.mentra-feedback-yes');
+  
+  if (feedbackNoBtn) {
+    feedbackNoBtn.addEventListener('click', window.feedbackNo);
+  }
+  if (feedbackYesBtn) {
+    feedbackYesBtn.addEventListener('click', window.feedbackYes);
+  }
 }
 
 let selectedQuickResponse = null;
@@ -435,8 +473,16 @@ window.submitReflection = async (website, url, prompt) => {
 
     document.getElementById('mentra-loading').style.display = 'none';
     document.getElementById('mentra-ai-response').style.display = 'block';
-    document.getElementById('mentra-ai-text').textContent = response.response || 
-      `Consider: ${prompt} Take this moment to realign with your intentions.`;
+    
+    // Format the AI response (convert markdown to HTML)
+    const aiText = response.response || `Consider: ${prompt} Take this moment to realign with your intentions.`;
+    const formattedText = aiText
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+      .replace(/\n\n/g, '</p><p style="margin: 0.8em 0;">') // Paragraphs
+      .replace(/\n/g, '<br>'); // Line breaks
+    
+    document.getElementById('mentra-ai-text').innerHTML = '<p style="margin: 0;">' + formattedText + '</p>';
 
     // Save reflection to IndexedDB
     chrome.runtime.sendMessage({

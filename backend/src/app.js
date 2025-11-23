@@ -2,9 +2,27 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
-// Middleware
+// Middleware - Allow Chrome extension and localhost
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || '*',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost and Chrome extensions
+    if (origin.startsWith('http://localhost') || 
+        origin.startsWith('https://localhost') ||
+        origin.startsWith('chrome-extension://')) {
+      return callback(null, true);
+    }
+    
+    // Allow custom CORS origins from env
+    const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -32,16 +50,18 @@ const reflectionsRoutes = require("./routes/v1/reflections.routes");
 const statsRoutes = require("./routes/v1/stats.routes");
 const settingsRoutes = require("./routes/v1/settings.routes");
 
-app.use("/api/v1", aiRoutes);
-app.use("/api/v1/reflections", reflectionsRoutes);
-app.use("/api/v1/stats", statsRoutes);
-app.use("/api/v1/settings", settingsRoutes);
+// Mount AI routes at /api/ai
+app.use("/api/ai", aiRoutes);
+app.use("/api/v1/ai", aiRoutes);
 
-// Also mount at /api for compatibility
-app.use("/api", aiRoutes);
+// Mount other routes
 app.use("/api/reflections", reflectionsRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/settings", settingsRoutes);
+
+app.use("/api/v1/reflections", reflectionsRoutes);
+app.use("/api/v1/stats", statsRoutes);
+app.use("/api/v1/settings", settingsRoutes);
 
 // 404 handler
 app.use((req, res) => {

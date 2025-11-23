@@ -21,7 +21,11 @@ const WARM_START_THRESHOLD = 2; // Gentle toast for first 2 distractions
 let lastResetDate = new Date().toDateString();
 
 // Reflection prompts (dynamically loaded from backend)
-let REFLECTION_PROMPTS = [];
+let REFLECTION_PROMPTS = [
+  "What brings you here right now?",
+  "Is this intentional, or a drift?",
+  "What do you truly need in this moment?"
+];
 
 // Initialize extension
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -223,9 +227,9 @@ chrome.webNavigation.onCompleted.addListener(async (details) => {
       // After warm start, normal blocking behavior
       warmStartActive = false;
       
-      // Get random prompt for variety
+      // Get random prompt for variety (with fallback)
       const promptIndex = Math.floor(Math.random() * REFLECTION_PROMPTS.length);
-      const prompt = REFLECTION_PROMPTS[promptIndex];
+      const prompt = REFLECTION_PROMPTS[promptIndex] || "What brings you here right now?";
       
       // Wait for page and content script to be ready, then send message
       // Use retry logic since content scripts may take time to initialize
@@ -419,7 +423,9 @@ async function getAIResponse(reflection, website, prompt) {
     });
     
     if (!embeddingResponse.ok) {
-      throw new Error('Failed to generate embedding');
+      const errorText = await embeddingResponse.text();
+      console.error('Embedding error:', errorText);
+      throw new Error(`Failed to generate embedding: ${embeddingResponse.status}`);
     }
     
     const { embedding } = await embeddingResponse.json();
@@ -466,11 +472,12 @@ async function getAIResponse(reflection, website, prompt) {
     });
     
     if (!ragResponse.ok) {
-      throw new Error('Failed to get RAG response');
+      const errorText = await ragResponse.text();
+      console.error('RAG error:', errorText);
+      throw new Error(`Failed to get RAG response: ${ragResponse.status}`);
     }
     
     const ragData = await ragResponse.json();
-    // RAG suggestion generated
     
     // Step 4: Save embedding to IndexedDB for future similarity search
     if (typeof storageManager !== 'undefined' && embedding) {
@@ -489,7 +496,7 @@ async function getAIResponse(reflection, website, prompt) {
     
     return ragData.suggestion;
   } catch (error) {
-    console.error('Error getting AI response:', error);
+    console.error('Error getting AI response:', error.message);
     
     // Fallback to gentle local responses
     const domain = new URL(website).hostname.replace('www.', '');
