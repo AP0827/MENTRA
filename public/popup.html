@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 380px;
+      min-height: 520px;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #f0f9ff 0%, #ecfdf5 100%);
+      color: #0f172a;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .header {
+      padding: 24px 24px 20px;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+      border-radius: 0 0 20px 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    }
+    
+    .logo-text {
+      flex: 1;
+    }
+    
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 1px;
+      letter-spacing: -0.3px;
+      color: #0f172a;
+    }
+    
+    .logo-text p {
+      font-size: 12px;
+      opacity: 0.7;
+      font-weight: 500;
+      color: #475569;
+    }
+    
+    .date-badge {
+      background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+      padding: 8px 16px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-block;
+      letter-spacing: 0.3px;
+      color: white;
+      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+    }
+    
+    .content {
+      padding: 0 20px 24px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(14, 165, 233, 0.2);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 16px rgba(14, 165, 233, 0.1);
+    }
+    
+    .stat-card:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(16, 185, 129, 0.12) 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+      border-color: rgba(14, 165, 233, 0.4);
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      letter-spacing: -0.8px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .stat-label {
+      font-size: 10px;
+      opacity: 0.7;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+    }
+    
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      letter-spacing: 0.3px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(14, 165, 233, 0.5);
+    }
+    
+    .btn:active {
+      transform: translateY(-2px);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+      color: white;
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+      color: #0f172a;
+      border: 1.5px solid rgba(14, 165, 233, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(16, 185, 129, 0.25) 100%);
+      border-color: rgba(14, 165, 233, 0.5);
+    }
+    
+    .footer {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(14, 165, 233, 0.2);
+      text-align: center;
+      font-size: 11px;
+      opacity: 0.7;
+      font-weight: 600;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-section">
+      <div class="logo">
+        <span style="font-size: 26px;">🧠</span>
+      </div>
+      <div class="logo-text">
+        <h1>Mentra</h1>
+        <p>Mindful Focus</p>
+      </div>
+    </div>
+    <div class="date-badge" id="current-date">Sunday, Nov 23</div>
+  </div>
+
+  <div class="content">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="focus-time">0h 0m</div>
+        <div class="stat-label">Focus Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="distractions">0</div>
+        <div class="stat-label">Distractions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="streak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="productivity">0%</div>
+        <div class="stat-label">Productivity</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="openDashboard" class="btn btn-primary">
+        <span>📊</span>
+        <span>Open Dashboard</span>
+      </button>
+      <a href="options.html" target="_blank" class="btn btn-secondary">
+        <span>⚙️</span>
+        <span>Settings</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      Stay focused, stay mindful 🧠✨
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+  <script>
+    // Update date
+    const dateEl = document.getElementById('current-date');
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentra - Settings</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9fafb;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #7c3aed;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 30px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 15px;
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+    
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background: #d1d5db;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .toggle.active {
+      background: #7c3aed;
+    }
+    
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: left 0.3s;
+    }
+    
+    .toggle.active .toggle-thumb {
+      left: 27px;
+    }
+    
+    input[type="text"] {
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .site-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 12px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin: 5px;
+      font-size: 14px;
+    }
+    
+    .site-tag button {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .success-message {
+      padding: 15px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ Mentra Settings</h1>
+    <p class="subtitle">Customize your focus experience</p>
+
+    <div class="section">
+      <h3 class="section-title">🌐 Monitored Websites</h3>
+      <input type="text" id="new-site" placeholder="Add website (e.g., twitter.com)">
+      <button class="btn btn-primary" onclick="addSite()">Add Website</button>
+      <div id="sites-list" style="margin-top: 15px;"></div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">🔔 Notifications</h3>
+      <div class="setting-item">
+        <span>Enable notifications</span>
+        <div class="toggle" id="notifications-toggle" onclick="toggleNotifications()">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">🤖 AI Model</h3>
+      <div class="setting-item">
+        <span>Use cloud AI (OpenAI GPT-4)</span>
+        <div class="toggle" id="ai-toggle" onclick="toggleAI()">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">📊 View Dashboard</h3>
+      <button class="btn btn-primary" onclick="openDashboard()">
+        Open Full Dashboard
+      </button>
+    </div>
+
+    <div class="success-message" id="success-message">
+      ✓ Settings saved successfully!
+    </div>
+  </div>
+
+  <script>
+    // Load initial settings
+    loadSettings();
+
+    function loadSettings() {
+      chrome.storage.local.get(['blockedSites', 'notifications', 'aiModel'], (result) => {
+        // Load blocked sites
+        const sites = result.blockedSites || [];
+        renderSites(sites);
+
+        // Load toggles
+        if (result.notifications) {
+          document.getElementById('notifications-toggle').classList.add('active');
+        }
+        if (result.aiModel === 'gpt4') {
+          document.getElementById('ai-toggle').classList.add('active');
+        }
+      });
+    }
+
+    function renderSites(sites) {
+      const container = document.getElementById('sites-list');
+      container.innerHTML = sites.map(site => `
+        <span class="site-tag">
+          ${site}
+          <button onclick="removeSite('${site}')">×</button>
+        </span>
+      `).join('');
+    }
+
+    function addSite() {
+      const input = document.getElementById('new-site');
+      const site = input.value.trim().toLowerCase();
+      
+      if (!site) return;
+
+      chrome.storage.local.get(['blockedSites'], (result) => {
+        const sites = result.blockedSites || [];
+        if (!sites.includes(site)) {
+          sites.push(site);
+          chrome.storage.local.set({ blockedSites: sites }, () => {
+            renderSites(sites);
+            input.value = '';
+            showSuccess();
+          });
+        }
+      });
+    }
+
+    function removeSite(site) {
+      chrome.storage.local.get(['blockedSites'], (result) => {
+        const sites = result.blockedSites || [];
+        const filtered = sites.filter(s => s !== site);
+        chrome.storage.local.set({ blockedSites: filtered }, () => {
+          renderSites(filtered);
+          showSuccess();
+        });
+      });
+    }
+
+    function toggleNotifications() {
+      const toggle = document.getElementById('notifications-toggle');
+      toggle.classList.toggle('active');
+      const enabled = toggle.classList.contains('active');
+      chrome.storage.local.set({ notifications: enabled }, showSuccess);
+    }
+
+    function toggleAI() {
+      const toggle = document.getElementById('ai-toggle');
+      toggle.classList.toggle('active');
+      const model = toggle.classList.contains('active') ? 'gpt4' : 'local';
+      chrome.storage.local.set({ aiModel: model }, showSuccess);
+    }
+
+    function openDashboard() {
+      chrome.tabs.create({ url: 'http://localhost:3000' });
+    }
+
+    function showSuccess() {
+      const message = document.getElementById('success-message');
+      message.style.display = 'block';
+      setTimeout(() => {
+        message.style.display = 'none';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Mentra - Mindful Digital Wellness",
+  "version": "1.0.0",
+  "description": "AI-powered browser extension for mindful productivity and focus",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Mentra"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "webNavigation",
+    "alarms",
+    "notifications",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["reflection-modal.html", "storage-manager.js", "styles/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_page": "options.html",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
