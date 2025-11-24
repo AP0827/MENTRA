@@ -8,4 +8,7 @@ router.get("/prompts", aiController.getPrompts);
 
 router.post("/embed", aiController.embed);
 
+// Add the missing /response endpoint
+router.post("/response", aiController.getResponse);
+
 module.exports = router;
