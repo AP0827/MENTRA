@@ -1,0 +1,50 @@
+Quick Tap Responses (No Typing Required)
+
+Common Reasons for Visiting
+
+“Just a quick break”
+“Feeling tired”
+“Feeling bored”
+“Procrastinating”
+“Mindless scroll”
+“Looking for inspiration”
+“Habit/automatic”
+“Actually need this for work/study”
+
+Energy or Mood Buttons
+
+“Low energy”
+“High stress”
+“Bored”
+“Curious”
+“Just checking”
+“Overwhelmed”
+
+Intention Buttons
+
+“I want a 2 min break”
+“I’ll refocus after this”
+“Unplanned visit”
+“I’m avoiding a task”
+“I’ll whitelist for 10 min”
+
+Micro-Decision Buttons
+
+“Proceed now”
+“Delay for 2 minutes”
+“Block for now”
+“Give me advice”
+
+Override Buttons
+
+“Let me continue”
+“Continue for 5 minutes only”
+“Continue this time”
+
+Optional Text Prompts (Short Sentence Frames)
+
+“I’m here because…”
+“Right now I really feel…”
+“Ideally I should be…”
+“My next task is…”
+
